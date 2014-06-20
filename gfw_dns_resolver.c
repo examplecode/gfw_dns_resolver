@@ -20,10 +20,8 @@
 #define   NI_MAXHOST 256
 #endif
 
-#define MAX_BLACK_LIST 100
-
 int max_wait_times = 3;
-char black_list[100][128] = {
+const char black_list[][16] = {
      "74.125.127.102", "74.125.155.102", "74.125.39.102", "74.125.39.113",
      "209.85.229.138",
      "128.121.126.139", "159.106.121.75", "169.132.13.103", "192.67.198.6",
@@ -107,7 +105,7 @@ void get_host_name(const char * domain, char * out)
 int is_bad_ip(char * ip)
 {
      int i ;
-     for(i = 0; i < MAX_BLACK_LIST; i++) {
+     for(i = 0; i < sizeof(black_list) / sizeof(black_list[0]); i++) {
           if(strcmp(black_list[i], ip) == 0) {
                // printf(">>>>> got bad ip:%s",ip);
 #ifdef DEBUG

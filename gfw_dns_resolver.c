@@ -29,7 +29,7 @@ void decode_dns_response(char * buffer, const char * hostna,char * ip) ;
 short decode2short(char * buffer) ;
 void get_host_name(const char * domain,char * out);
 
-int max_wait_times = 3; 
+int max_wait_times = 3;
 
 
 char black_list[100][128] = {
@@ -38,10 +38,10 @@ char black_list[100][128] = {
 			 "128.121.126.139", "159.106.121.75", "169.132.13.103", "192.67.198.6",
 			 "202.106.1.2", "202.181.7.85", "203.161.230.171", "203.98.7.65",
 			 "207.12.88.98", "208.56.31.43", "209.145.54.50", "209.220.30.174",
-			 "209.36.73.33", "211.94.66.147", "213.169.251.35", "216.221.188.182", 
+			 "209.36.73.33", "211.94.66.147", "213.169.251.35", "216.221.188.182",
 			 "216.234.179.13", "243.185.187.39", "37.61.54.158", "4.36.66.178",
 			 "46.82.174.68", "59.24.3.173", "64.33.88.161", "64.33.99.47",
-			 "64.66.163.251", "65.104.202.252", "65.160.219.113", "66.45.252.237",                                                                                                                           
+			 "64.66.163.251", "65.104.202.252", "65.160.219.113", "66.45.252.237",
 			 "72.14.205.104", "72.14.205.99", "78.16.49.15", "8.7.198.45", "93.46.8.89"
 };
 
@@ -54,7 +54,7 @@ int main(int argc, char const *argv[])
 		char ip[NI_MAXHOST];
 		gfw_resolve(argv[1],ip);
 		printf ("The real ip is: %s\n",ip);
-		
+
 	}
 
 	/* code */
@@ -65,7 +65,7 @@ int is_little_endian( )
 {
     {
        union w
-       {  
+       {
               int a;
               char b;
        } c;
@@ -85,7 +85,7 @@ void get_host_name(const char * domain,char * out)
     int error;
 
     error = getaddrinfo(domain,NULL,NULL,&result);
-    if(error != 0) 
+    if(error != 0)
     {
     	printf ("no such host %s.\ngetaddrinfo error: %s\n",domain,
                   gai_strerror(error));
@@ -101,18 +101,18 @@ void get_host_name(const char * domain,char * out)
     {
     	printf("getnameinfo error:%d",error);
         exit(-1);
-    }  
+    }
 
     freeaddrinfo(result);
-   
+
 }
 
-int is_bad_ip(char * ip) 
-{	
+int is_bad_ip(char * ip)
+{
 	int i ;
-	for(i = 0; i < MAX_BLACK_LIST; i++) 
+	for(i = 0; i < MAX_BLACK_LIST; i++)
 	{
-		if(strcmp(black_list[i],ip) == 0) 
+		if(strcmp(black_list[i],ip) == 0)
 		{
 			// printf(">>>>> got bad ip:%s",ip);
 			#ifdef DEBUG
@@ -125,12 +125,12 @@ int is_bad_ip(char * ip)
 	return 0;
 }
 //extract ip address from dns answer package
-void decode_dns_response(char * buffer,const char * hostna,char * ip) 
+void decode_dns_response(char * buffer,const char * hostna,char * ip)
 {
 	int h_len = strlen(hostna);
 	char * p = buffer + 6; //skip qncount
 	short qncount = decode2short(p);
-	
+
 	//skip query answer field
 	p = buffer  + 1+ 12 +  h_len + 1  + 4;
 
@@ -138,10 +138,10 @@ void decode_dns_response(char * buffer,const char * hostna,char * ip)
 	for(i = 0; i < qncount; i++)
 	{
 		char flag = p[0];
-		if((flag & 0xc0) == 0xc0) 
+		if((flag & 0xc0) == 0xc0)
 		{
 			p+= 2;
-		} else 
+		} else
 		{
 			p+= 1+ h_len + 1;
 		}
@@ -151,20 +151,20 @@ void decode_dns_response(char * buffer,const char * hostna,char * ip)
 		#ifdef DEBUG
     		printf("qncount = %d query type:%d \n",qncount,query_type);
 		#endif
-		
 
-		
+
+
 		p += 8;
 		int data_len = decode2short(p);
 
-		p+=2; //move to data area 
+		p+=2; //move to data area
 
 		if(query_type == 0x0001 )
 		{
 			bzero(ip,NI_MAXHOST);
 			int j;
 			for(j = 0; j < data_len ; j ++) {
-			
+
 				int v  = p[0];
 				v = v>0?v:0x0ff & v;
 				char tmp[4];
@@ -172,7 +172,7 @@ void decode_dns_response(char * buffer,const char * hostna,char * ip)
 				strcat(ip,tmp);
 				if(j < data_len -1) {
 					strcat(ip,".");
-				}	
+				}
 				p++;
 			}
 
@@ -180,7 +180,7 @@ void decode_dns_response(char * buffer,const char * hostna,char * ip)
 			p+= data_len;
 		}
 
-	}	 
+	}
 }
 
 short decode2short(char * buffer) {
@@ -191,7 +191,7 @@ short decode2short(char * buffer) {
 	if(is_little_endian) {
 		p[i] = buffer[i+1];
 		p[i+1] = buffer[i];
-	} else 
+	} else
 	{
 		p[i] = buffer[i];
 		p[i+1] = buffer[i+1];
@@ -199,16 +199,16 @@ short decode2short(char * buffer) {
 	return v;
 }
 
-void  gfw_resolve(const char * hostname,char * out_ip) 
+void  gfw_resolve(const char * hostname,char * out_ip)
 {
 	struct sockaddr_in a;
 	struct sockaddr_in dest;
 
-	int s; 
+	int s;
 
 	get_host_name(hostname,out_ip) ;
 
-	if(!is_bad_ip(out_ip)) 
+	if(!is_bad_ip(out_ip))
 	{
 		return;
 	}
@@ -217,9 +217,9 @@ void  gfw_resolve(const char * hostname,char * out_ip)
 
 	dest.sin_family = AF_INET;
     dest.sin_port = htons(53);
-    dest.sin_addr.s_addr = inet_addr(DNS_SERVER); 
+    dest.sin_addr.s_addr = inet_addr(DNS_SERVER);
 
-    socklen_t addr_len =sizeof(struct sockaddr_in);  
+    socklen_t addr_len =sizeof(struct sockaddr_in);
 
 	char buff[]  = { 0x20,0x30,0x40,0x50};
 
@@ -245,30 +245,30 @@ void  gfw_resolve(const char * hostname,char * out_ip)
 	int i ;
 	for (i = 0; i < max_wait_times; i++) {
 
-		
+
 		char recv_buf[1024];
 
-		len = recvfrom(s,recv_buf,sizeof(recv_buf),0,(struct sockaddr*)&dest,&addr_len); 
+		len = recvfrom(s,recv_buf,sizeof(recv_buf),0,(struct sockaddr*)&dest,&addr_len);
 
 		#ifdef DEBUG
 			printf ("================= receive from dns server  ================\n");
 			printf("receive len %d\n",len);
-			hexDump("receive buffer",recv_buf,len);	
+			hexDump("receive buffer",recv_buf,len);
 		#endif
-	
+
 		decode_dns_response(recv_buf,hostname,out_ip);
-		
-		if(!is_bad_ip(out_ip)) 
+
+		if(!is_bad_ip(out_ip))
 		{
 			break;
-		} 
+		}
 
 	}
 
-	free(buffer);	
+	free(buffer);
 }
 
-char * build_request_data(char * hostname,int * ret_size) 
+char * build_request_data(char * hostname,int * ret_size)
 {
 	//head + (host length +1) + eof sign + qtype + qclass
 	int size = 12 + strlen(hostname) + 1 + 1+ 4;
@@ -285,7 +285,7 @@ char * build_request_data(char * hostname,int * ret_size)
 	memcpy(pbuf,header,10);
 	pbuf+=10;
 	char * pstr = strtok(hostname,".");
-	while(pstr != NULL) 
+	while(pstr != NULL)
 	{
 
 		char len = strlen(pstr);

@@ -24,7 +24,7 @@ public class GFWDnsResolver {
 	
 	public  static  String DNS_SERVER = "8.8.8.8";
 	
-	private boolean debug = false;
+	private boolean debug = true;
 	
 	private int maxTryTimes = 2;
 	private int waitTimes = 3;

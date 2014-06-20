@@ -29,8 +29,6 @@ void decode_dns_response(char * buffer, const char * hostna,char * ip) ;
 short decode2short(char * buffer) ;
 void get_host_name(const char * domain,char * out);
 
-int debug = 1;
-
 int max_wait_times = 3; 
 
 
@@ -116,7 +114,10 @@ int is_bad_ip(char * ip)
 	{
 		if(strcmp(black_list[i],ip) == 0) 
 		{
-			printf(">>>>> got bad ip:%s",ip);
+			// printf(">>>>> got bad ip:%s",ip);
+			#ifdef DEBUG
+				printf(">>>>> got bad ip:%s",ip);
+			#endif
 			bzero(ip,NI_MAXHOST);
 			return 1;
 		}
@@ -145,10 +146,13 @@ void decode_dns_response(char * buffer,const char * hostna,char * ip)
 			p+= 1+ h_len + 1;
 		}
 		short query_type =  decode2short(p);
+
+
+		#ifdef DEBUG
+    		printf("qncount = %d query type:%d \n",qncount,query_type);
+		#endif
 		
-		if(debug) {
-			printf("qncount = %d query type:%d \n",qncount,query_type);
-		}
+
 		
 		p += 8;
 		int data_len = decode2short(p);
@@ -231,23 +235,26 @@ void  gfw_resolve(const char * hostname,char * out_ip)
         perror("sendto failed");
     }
 
-	if(debug) {
-
-		printf("buffer len %d\n",len);
+    #ifdef DEBUG
+    	printf ("================= send request to from dns server  ================\n");
+    	printf("buffer len %d\n",len);
 		hexDump("send buffer",buffer,len);
-	}
+	#endif
+
 
 	int i ;
 	for (i = 0; i < max_wait_times; i++) {
 
-		printf ("================= receive from dns server  ================\n");
+		
 		char recv_buf[1024];
 
 		len = recvfrom(s,recv_buf,sizeof(recv_buf),0,(struct sockaddr*)&dest,&addr_len); 
-		if(debug) {
+
+		#ifdef DEBUG
+			printf ("================= receive from dns server  ================\n");
 			printf("receive len %d\n",len);
-			hexDump("receive buffer",recv_buf,len);
-		}	
+			hexDump("receive buffer",recv_buf,len);	
+		#endif
 	
 		decode_dns_response(recv_buf,hostname,out_ip);
 		
@@ -271,8 +278,7 @@ char * build_request_data(char * hostname,int * ret_size)
 	bzero(buffer, size);
 
 	unsigned short seq = rand();
-	printf("seq = %d\n",seq);
-	
+
 	char header[] = {0x01,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00};
 	memcpy(pbuf,&seq,2);
 	pbuf +=2;
@@ -281,7 +287,7 @@ char * build_request_data(char * hostname,int * ret_size)
 	char * pstr = strtok(hostname,".");
 	while(pstr != NULL) 
 	{
-		printf("pstr =%s\n", pstr);
+
 		char len = strlen(pstr);
 		memcpy(pbuf,&len,1);
 		// strncpy(buffer,&len,1);

@@ -105,7 +105,7 @@ void get_host_name(const char * domain, char * out)
 int is_bad_ip(char * ip)
 {
      int i ;
-     for(i = 0; i < sizeof(black_list) / sizeof(black_list[0]); i++) {
+     for(i = 0; i < sizeof(black_list) / sizeof black_list[0]; i++) {
           if(strcmp(black_list[i], ip) == 0) {
                // printf(">>>>> got bad ip:%s",ip);
 #ifdef DEBUG

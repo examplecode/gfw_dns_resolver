@@ -32,7 +32,7 @@ void get_host_name(const char * domain,char * out);
 int max_wait_times = 3; 
 
 
-char black_list[100][128] = {
+char black_list[MAX_BLACK_LIST][128] = {
 			"74.125.127.102", "74.125.155.102", "74.125.39.102", "74.125.39.113",
 			 "209.85.229.138",
 			 "128.121.126.139", "159.106.121.75", "169.132.13.103", "192.67.198.6",

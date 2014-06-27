@@ -49,10 +49,11 @@ int main(int argc, char const *argv[])
      if(argc < 2) {
           printf("Usage: %s domain\n",argv[0]);
      } else {
-          char ip[NI_MAXHOST];
-          gfw_resolve(argv[1],ip);
-          printf ("The real ip is: %s\n",ip);
-
+          while (--argc > 0) {
+               char ip[NI_MAXHOST];
+               gfw_resolve(*++argv, ip);
+               printf ("The real ip is: %s\n", ip);
+          }
      }
 
      /* code */
